@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  selenoid:
+    container_name: selenoid
+    networks: 
+      - jenkins  
+    image: aerokube/selenoid:1.10.7
+    restart: unless-stopped
+    volumes:
+      - "./config:/etc/selenoid"
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "./video:/opt/selenoid/video"
+      - "./logs:/opt/selenoid/logs"
+    environment:
+      - OVERRIDE_VIDEO_OUTPUT_DIR=/path/to/config/video
+    command: ["-conf", "/etc/selenoid/browsers.json", "-video-output-dir", "/opt/selenoid/video", "-log-output-dir", "/opt/selenoid/logs"]
+    ports:
+      - "4444:4444"
+
+  selenoid-ui:
+    container_name: selenoid-ui
+    image: aerokube/selenoid-ui
+    command: --selenoid-uri http://selenoid:4444
+    depends_on:
+      - selenoid  
+    ports:
+      - 8088:8080
+    networks: 
+      - jenkins   
+
+  sdet:
+    container_name: sdet-py
+    build:
+      context: ./project
+      dockerfile: Dockerfile
+    depends_on:
+      - selenoid-ui
+    volumes:
+        - "./project:/wd"
+    networks: 
+      - jenkins
+    stdin_open: true # docker run -i
+    tty: true        # docker run -t    
+    command: pytest --alluredir=./allure-results ./tests
+
+networks: 
+  jenkins:
+    external: true
+
