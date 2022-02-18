@@ -11,7 +11,7 @@ class TestGoogleCalc():
     def run_around_tests(self):
         chrome_options = webdriver.ChromeOptions()
         self.driver = webdriver.Remote(
-            command_executor='selenoid:4444/wd/hub',
+            command_executor='http://selenoid:4444/wd/hub',
             desired_capabilities=DesiredCapabilities.CHROME.copy(),
             options=chrome_options
         )
