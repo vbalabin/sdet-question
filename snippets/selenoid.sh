@@ -2,7 +2,7 @@ docker run \
   --name selenoid-d \
   --detach \
   --restart unless-stopped \
-  --network jenkins \
+  --network sdet \
   --network-alias selenoid\
   --shm-size="2g" \
   --env DOCKER_HOST=tcp://docker:2376 \
@@ -19,4 +19,4 @@ docker run \
   -log-output-dir /etc/logs \
   -session-delete-timeout 2m \
   -service-startup-timeout 1m
-  
+
